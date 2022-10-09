@@ -9,6 +9,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 // DumpToWriter - writes a slice content into an io.Writer.
@@ -64,9 +65,13 @@ func DumpToWriter(slice interface{}, writer io.Writer, options ...CsvOptions) er
 				continue
 			}
 
-			switch valueRv.Type().Field(j).Type.Kind() {
-			case reflect.Float64, reflect.Float32:
-				line = append(line, strconv.FormatFloat(value.Float(), 'f', -1, 64))
+			switch v := value.Interface().(type) {
+			case float64:
+				line = append(line, strconv.FormatFloat(v, 'f', -1, 64))
+			case float32:
+				line = append(line, strconv.FormatFloat(float64(v), 'f', -1, 64))
+			case time.Time:
+				line = append(line, v.String())
 			default:
 				line = append(line, fmt.Sprint(value))
 			}

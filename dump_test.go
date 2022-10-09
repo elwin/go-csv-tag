@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var tabTest = []test{
@@ -12,6 +15,28 @@ var tabTest = []test{
 
 var tabTestNoID = []testNoID{
 	{"name", 1, 0.000001},
+}
+
+type testTime struct {
+	Name string    `csv:"header1"`
+	Time time.Time `csv:"header2"`
+}
+
+var timeTest = []testTime{
+	{Name: "name", Time: time.Date(2022, 11, 11, 0, 0, 0, 0, time.UTC)},
+}
+
+func TestTime(t *testing.T) {
+	out, err := DumpToString(timeTest)
+	if err != nil {
+		t.Fail()
+	}
+
+	const expected = `header1,header2
+name,2022-11-11 00:00:00 +0000 UTC
+`
+
+	assert.Equal(t, expected, out)
 }
 
 func TestDumpToFileEmptyName(t *testing.T) {
